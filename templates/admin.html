@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Admin Panel</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='admin.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <div class="top-bar">
+
+        <div>
+
+            <h2>Admin Management</h2>
+
+            <p>Xin chào {{ session["name"] }}</p>
+
+        </div>
+
+        <div>
+
+            <a class="logout-btn" href="/logout">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- ================= TAB ================= -->
+
+    <div class="tabs">
+
+        <button
+            class="tab-btn active"
+            data-tab="hrTab"
+            onclick="showTab('hrTab',this)">
+
+            Quản lý HR
+
+        </button>
+
+        <button
+            class="tab-btn"
+            data-tab="emailTab"
+            onclick="showTab('emailTab',this)">
+
+            Quản lý Email
+
+        </button>
+
+    </div>
+
+    <!-- ================= HR TAB ================= -->
+
+    <div
+        id="hrTab"
+        class="tab-content active">
+
+        <div class="card">
+
+            <h3>Thêm HR</h3>
+
+            <form
+                action="/admin/hr/add"
+                method="POST">
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Họ tên"
+                    required>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    required>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Mật khẩu"
+                    required>
+
+                <button type="submit">
+
+                    Thêm HR
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Danh sách HR</h3>
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>STT</th>
+
+                    <th>Họ tên</th>
+
+                    <th>Email</th>
+
+                    <th>Mật khẩu</th>
+
+                    <th>Hành động</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for hr in users %}
+
+                <tr>
+
+                    <td>{{ loop.index }}</td>
+
+                    <td>{{ hr.name }}</td>
+
+                    <td>{{ hr.email }}</td>
+
+                    <td>{{ hr.password }}</td>
+
+                    <td>
+
+                        <button
+                            class="edit-btn"
+                            onclick="openEditHR(
+                                '{{ hr.name }}',
+                                '{{ hr.email }}',
+                                '{{ hr.password }}'
+                            )">
+
+                            Sửa
+
+                        </button>
+
+                        <a
+                            class="delete-btn"
+                            href="/admin/hr/delete/{{ hr.email }}"
+                            onclick="return confirm('Xóa HR này?')">
+
+                            Xóa
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ================= EMAIL TAB ================= -->
+
+    <div
+        id="emailTab"
+        class="tab-content">
+
+        <div class="card">
+
+            <h3>Thêm Email</h3>
+
+            <form
+                action="/admin/email/add"
+                method="POST">
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    required>
+
+                <button type="submit">
+
+                    Thêm Email
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Danh sách Email</h3>
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>STT</th>
+
+                    <th>Email</th>
+
+                    <th>Hành động</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for item in shared_emails %}
+
+                <tr>
+
+                    <td>{{ loop.index }}</td>
+
+                    <td>{{ item.email }}</td>
+
+                    <td>
+
+                        <button
+                            class="edit-btn"
+                            onclick="openEditEmail(
+                                '{{ item.email }}'
+                            )">
+
+                            Sửa
+
+                        </button>
+
+                        <a
+                            class="delete-btn"
+                            href="/admin/email/delete/{{ item.email }}"
+                            onclick="return confirm('Xóa email này?')">
+
+                            Xóa
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+        <!-- ================= EDIT HR MODAL ================= -->
+
+    <div id="editHRModal" class="modal">
+
+        <div class="modal-content">
+
+            <h3>Sửa HR</h3>
+
+            <form
+                action="/admin/hr/update"
+                method="POST">
+
+                <label>Họ tên</label>
+
+                <input
+                    id="edit_hr_name"
+                    type="text"
+                    name="name"
+                    required>
+
+                <label>Email</label>
+
+                <input
+                    id="edit_hr_email"
+                    type="email"
+                    name="email"
+                    readonly>
+
+                <label>Mật khẩu</label>
+
+                <input
+                    id="edit_hr_password"
+                    type="text"
+                    name="password"
+                    required>
+
+                <br><br>
+
+                <button type="submit">
+
+                    Lưu
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="closeEditHR()">
+
+                    Hủy
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- ================= EDIT EMAIL MODAL ================= -->
+
+    <div id="editEmailModal" class="modal">
+
+        <div class="modal-content">
+
+            <h3>Sửa Email</h3>
+
+            <form
+                action="/admin/email/update"
+                method="POST">
+
+                <label>Email cũ</label>
+
+                <input
+                    id="old_email"
+                    type="email"
+                    name="old_email"
+                    readonly>
+
+                <label>Email mới</label>
+
+                <input
+                    id="new_email"
+                    type="email"
+                    name="new_email"
+                    required>
+
+                <br><br>
+
+                <button type="submit">
+
+                    Lưu
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="closeEditEmail()">
+
+                    Hủy
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function showTab(id, btn){
+
+    document
+        .querySelectorAll(".tab-content")
+        .forEach(function(tab){
+
+            tab.classList.remove("active");
+
+        });
+
+    document
+        .querySelectorAll(".tab-btn")
+        .forEach(function(button){
+
+            button.classList.remove("active");
+
+        });
+
+    document
+        .getElementById(id)
+        .classList.add("active");
+
+    btn.classList.add("active");
+
+    localStorage.setItem("admin_active_tab", id);
+
+}
+
+// ====================== HR ======================
+
+function openEditHR(name,email,password){
+
+    document.getElementById("edit_hr_name").value=name;
+
+    document.getElementById("edit_hr_email").value=email;
+
+    document.getElementById("edit_hr_password").value=password;
+
+    document.getElementById("editHRModal").style.display="flex";
+
+}
+
+function closeEditHR(){
+
+    document.getElementById("editHRModal").style.display="none";
+
+}
+
+// ====================== EMAIL ======================
+
+function openEditEmail(email){
+
+    document.getElementById("old_email").value=email;
+
+    document.getElementById("new_email").value=email;
+
+    document.getElementById("editEmailModal").style.display="flex";
+
+}
+
+function closeEditEmail(){
+
+    document.getElementById("editEmailModal").style.display="none";
+
+}
+
+window.addEventListener("DOMContentLoaded", function(){
+
+    const savedTab = localStorage.getItem("admin_active_tab");
+
+    if(!savedTab){
+        return;
+    }
+
+    const tab = document.getElementById(savedTab);
+
+    const btn = document.querySelector(
+        `.tab-btn[data-tab="${savedTab}"]`
+    );
+
+    if(tab && btn){
+
+        showTab(savedTab, btn);
+
+    }
+
+});
+
+window.onclick=function(event){
+
+    if(event.target==document.getElementById("editHRModal")){
+
+        closeEditHR();
+
+    }
+
+    if(event.target==document.getElementById("editEmailModal")){
+
+        closeEditEmail();
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

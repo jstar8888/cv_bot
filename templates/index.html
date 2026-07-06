@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>CV Parser</title>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="success-box">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="main-container">
+    <div id="toast" class="toast"></div>
+
+    <div class="top-bar">
+
+        <div>
+
+            <h2>CV Parser</h2>
+
+            <p>
+                Xin chào <b>{{ name }}</b>
+                ({{ email }})
+            </p>
+
+        </div>
+
+        <div>
+
+            <a href="/logout"
+               class="logout-btn">
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Upload CV</h3>
+
+        <form
+            action="/upload"
+            method="POST"
+            enctype="multipart/form-data">
+
+            <!-- Job -->
+
+            <div class="job-select-box">
+
+    <label class="section-title">
+
+         Chọn vị trí ứng tuyển
+
+    </label>
+
+    <select
+        name="job_name"
+        class="job-select"
+        required>
+
+        <option value="Auto Detect" selected>
+
+             Auto Detect (Khuyến nghị)
+
+        </option>
+
+        {% for job in job_names %}
+
+        <option value="{{ job }}">
+
+            {{ job }}
+
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <div class="job-tip">
+
+        Nếu chọn <b>Auto Detect</b>, hệ thống sẽ tự nhận diện vị trí từ CV.
+
+    </div>
+
+</div>
+
+<br>
+
+            <br><br>
+
+            <!-- File -->
+
+            <label>Chọn CV</label>
+
+            <input
+                id="cv_files"
+                type="file"
+                name="cv_files"
+                multiple
+                hidden>
+
+            <button
+                type="button"
+                class="choose-file-btn"
+                onclick="document.getElementById('cv_files').click()">
+
+                📁 Chọn CV
+
+            </button>
+
+            <div class="selected-files-box">
+
+                <div class="selected-header">
+
+                    Selected Files
+                    (<span id="file-count">0</span>)
+
+                </div>
+
+                <div id="selected-files-list" class="selected-files-list">
+
+                    <div class="empty-text">
+
+                        Chưa có CV nào được chọn
+
+                    </div>
+
+                </div>
+
+            </div>
+            <br><br>
+
+           <!-- Permission -->
+
+            <label>Được chia sẻ với</label>
+
+            <div class="permission-action">
+
+                <button type="button" onclick="selectAllEmails()">
+                    ✓ Chọn tất cả
+                </button>
+
+                <button type="button" onclick="unselectAllEmails()">
+                    ✕ Bỏ chọn tất cả
+                </button>
+
+            </div>
+
+            <div class="permission-list">
+
+                {% for user in related_emails %}
+
+                <label class="permission-item">
+
+                    <input
+                        type="checkbox"
+                        name="related_emails"
+                        value="{{ user.email }}"
+                        checked>
+
+                    {{ user.email }}
+
+                </label>
+
+                {% endfor %}
+
+            </div>
+
+            <br>
+
+            <button
+                type="submit"
+                class="upload-btn">
+
+                Upload
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div id="loading-overlay">
+
+    <div class="loading-box">
+
+        <div class="spinner"></div>
+
+        <h3>Đang xử lý CV</h3>
+
+        <p id="loading-text">
+
+            Đang upload file...
+
+        </p>
+
+        <small>
+
+            Vui lòng chờ đến khi hoàn tất.
+            Không đóng trình duyệt.
+
+        </small>
+
+    </div>
+
+</div>
+
+<script>
+
+function selectAllEmails() {
+
+    document
+        .querySelectorAll('input[name="related_emails"]')
+        .forEach(cb => cb.checked = true);
+
+}
+
+function unselectAllEmails() {
+
+    document
+        .querySelectorAll('input[name="related_emails"]')
+        .forEach(cb => cb.checked = false);
+
+}
+
+
+const input = document.getElementById("cv_files");
+
+const form = document.querySelector("form");
+
+const uploadBtn = document.querySelector(".upload-btn");
+
+let uploading = false;
+
+let selectedFiles = [];
+
+function showToast(message){
+
+    const toast = document.getElementById("toast");
+
+    toast.innerHTML = message;
+
+    toast.style.display = "block";
+
+    setTimeout(function(){
+
+        toast.style.display = "none";
+
+    },3000);
+
+}
+
+function showLoading(){
+
+    uploading = true;
+
+    document.getElementById("loading-overlay").style.display = "flex";
+
+    document
+        .querySelectorAll("button,input,select,a")
+        .forEach(function(el){
+
+            if(el !== uploadBtn){
+
+                el.style.pointerEvents = "none";
+
+            }
+
+        });
+
+    uploadBtn.disabled = true;
+
+    uploadBtn.innerHTML = "Đang upload...";
+
+}
+
+function startLoadingMessages(){
+
+    const text = document.getElementById("loading-text");
+
+    const messages = [
+
+        "Đang upload file...",
+
+        "Đang đọc CV...",
+
+        "Đang phân tích AI...",
+
+        "Đang lưu Google Drive...",
+
+        "Sắp hoàn tất..."
+
+    ];
+
+    let index = 0;
+
+    setInterval(function(){
+
+        index++;
+
+        if(index < messages.length){
+
+            text.innerHTML = messages[index];
+
+        }
+
+    },3000);
+
+}
+
+form.addEventListener("submit",function(e){
+
+    if(selectedFiles.length===0){
+
+        showToast("⚠ Vui lòng chọn ít nhất một CV.");
+
+        e.preventDefault();
+
+        return;
+
+    }
+
+    const checkedEmails = document.querySelectorAll(
+
+        'input[name="related_emails"]:checked'
+
+    );
+
+    if(checkedEmails.length===0){
+
+        showToast("⚠ Vui lòng chọn ít nhất một người được chia sẻ.");
+
+        e.preventDefault();
+
+        return;
+
+    }
+
+    showLoading();
+
+    startLoadingMessages();
+
+});
+
+input.addEventListener("change", function () {
+
+    for (const file of input.files) {
+
+        const exists = selectedFiles.some(f =>
+            f.name === file.name &&
+            f.size === file.size &&
+            f.lastModified === file.lastModified
+        );
+
+        if (!exists) {
+
+            selectedFiles.push(file);
+
+        }
+
+    }
+
+    refreshFileList();
+
+});
+
+function refreshFileList() {
+
+    const list = document.getElementById("selected-files-list");
+
+    const count = document.getElementById("file-count");
+
+    list.innerHTML = "";
+
+    if (selectedFiles.length === 0) {
+
+        list.innerHTML =
+            '<div class="empty-text">Chưa có CV nào được chọn</div>';
+
+        count.innerText = 0;
+
+        input.value = "";
+
+        return;
+
+    }
+
+    count.innerText = selectedFiles.length;
+
+    const dt = new DataTransfer();
+
+    selectedFiles.forEach((file, index) => {
+
+        dt.items.add(file);
+
+        const item = document.createElement("div");
+
+        item.className = "selected-file";
+
+        item.innerHTML = `
+            <span class="file-name">
+                📄 ${file.name}
+            </span>
+
+            <button
+                type="button"
+                class="remove-file-btn"
+                onclick="removeFile(${index})">
+
+                ✕
+
+            </button>
+        `;
+
+        list.appendChild(item);
+
+    });
+
+    input.files = dt.files;
+
+}
+
+function removeFile(index) {
+
+    selectedFiles.splice(index, 1);
+
+    refreshFileList();
+
+}
+
+
+</script>
+
+</body>
+
+</html>

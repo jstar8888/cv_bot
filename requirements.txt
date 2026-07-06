@@ -1,0 +1,10 @@
+Flask
+python-dotenv
+PyMuPDF
+python-docx
+google-genai
+pydantic
+gspread
+google-api-python-client
+google-auth
+openpyxl

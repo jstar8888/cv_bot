@@ -1,0 +1,131 @@
+/* ===========================
+   Login Page
+=========================== */
+
+.login-page{
+
+    margin:0;
+
+    padding:0;
+
+    background:#f3f5f9;
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+.login-box{
+
+    width:420px;
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:12px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+
+}
+
+.login-box h1{
+
+    text-align:center;
+
+    margin-bottom:5px;
+
+}
+
+.login-box p{
+
+    text-align:center;
+
+    color:#777;
+
+    margin-bottom:30px;
+
+}
+
+.login-box label{
+
+    display:block;
+
+    margin-top:15px;
+
+    margin-bottom:8px;
+
+    font-weight:bold;
+
+}
+
+.login-box input{
+
+    width:100%;
+
+    padding:12px;
+
+    border:1px solid #ccc;
+
+    border-radius:6px;
+
+    font-size:15px;
+
+    box-sizing:border-box;
+
+}
+
+.login-box button{
+
+    width:100%;
+
+    margin-top:30px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:6px;
+
+    background:#007bff;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+.login-box button:hover{
+
+    background:#0056b3;
+
+}
+
+.error-box{
+
+    background:#ffe6e6;
+
+    color:#c62828;
+
+    border:1px solid #f5a3a3;
+
+    padding:12px;
+
+    border-radius:6px;
+
+    margin-bottom:20px;
+
+    text-align:center;
+
+    font-weight:bold;
+
+}
