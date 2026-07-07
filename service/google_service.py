@@ -2,6 +2,7 @@ from google.oauth2.credentials import Credentials
 import os
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
+from database import supabase
 import json
 from dotenv import load_dotenv
 
@@ -20,19 +21,45 @@ CLIENT_SECRET_FILE = json.loads(
 TOKEN_FILE = "credentials/token.json"
 
 
+def get_google_oauth():
+
+    response = (
+        supabase.table("secrets")
+        .select("payload")
+        .eq("key", "google_oauth")
+        .single()
+        .execute()
+    )
+
+    return response.data["payload"]
+
+
+
+def update_google_oauth(creds):
+    (
+        supabase.table("secrets")
+        .update({
+            "payload": json.loads(creds.to_json())
+        })
+        .eq("key", "google_oauth")
+        .execute()
+    )
+
 def get_credentials():
     creds = None
 
-    if os.path.exists(TOKEN_FILE):
-        creds = Credentials.from_authorized_user_file(
-            TOKEN_FILE,
-            SCOPES
-        )
+    data = get_google_oauth()
+
+    creds = Credentials.from_authorized_user_info(
+        data,
+        SCOPES
+    )
 
     if not creds or not creds.valid:
 
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
+            update_google_oauth(creds)
 
         else:
             flow = InstalledAppFlow.from_client_config(
@@ -41,8 +68,9 @@ def get_credentials():
             )
 
             creds = flow.run_local_server(port=0)
+            update_google_oauth(creds)
 
-        with open(TOKEN_FILE, "w") as token:
-            token.write(creds.to_json())
+            with open(TOKEN_FILE, "w") as token:
+                token.write(creds.to_json())
 
     return creds
