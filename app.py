@@ -11,6 +11,7 @@ from service.sheet_service import *
 from service.drive_service import upload_cv
 from service.jobs_service import get_all_job_names
 from datetime import datetime
+from extensions import mail
 from auth2 import (
     authenticate_user,
     load_hr,
@@ -20,12 +21,26 @@ from auth2 import (
     load_shared_email,
     add_shared_email,
     delete_shared_email,
-    update_shared_email
+    update_shared_email,
+    get_admin_by_email,
+    update_admin_password,
+    save_reset_otp,
+    verify_reset_otp,
+    delete_reset_otp
 )
+from service.mail_service import (send_reset_otp, generate_otp)
 
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USER")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+
+mail.init_app(app)
 
 UPLOAD_FOLDER = "/tmp/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -90,6 +105,111 @@ def do_login():
     return render_template(
         "login.html",
         error="Sai tài khoản hoặc mật khẩu!"
+    )
+
+@app.route("/forgot-password")
+def forgot_password_page():
+    return render_template("forgot_password.html")
+
+@app.route("/forgot-password", methods=["POST"])
+def forgot_password():
+
+    email = request.form["email"]
+
+    user = get_admin_by_email(email)
+
+    if not user:
+        return render_template(
+            "forgot_password.html",
+            error="Email admin không tồn tại."
+        )
+
+    otp = generate_otp()
+
+    save_reset_otp(email, otp)
+
+    if not send_reset_otp(email, otp):
+        return render_template(
+            "forgot_password.html",
+            error="Không thể gửi OTP. Vui lòng thử lại."
+        )
+
+    return render_template(
+        "verify_otp.html",
+        email=email
+    )
+
+@app.route("/verify-otp", methods=["POST"])
+def verify_otp():
+
+    email = request.form["email"]
+    otp = request.form["otp"]
+
+    if not verify_reset_otp(email, otp):
+        return render_template(
+            "verify_otp.html",
+            email=email,
+            error="OTP không đúng hoặc đã hết hạn."
+        )
+
+    session["reset_email"] = email
+
+    return render_template(
+        "reset_password.html",
+        email=email
+    )
+
+@app.route("/reset-password", methods=["POST"])
+def reset_password():
+
+    email = session.get("reset_email")
+
+    if not email:
+        return redirect("/login")
+
+    password = request.form["password"]
+    confirm_password = request.form["confirm_password"]
+
+    if password != confirm_password:
+        return render_template(
+            "reset_password.html",
+            error="Mật khẩu xác nhận không khớp."
+        )
+
+    update_admin_password(email, password)
+
+    delete_reset_otp(email)
+
+    session.pop("reset_email", None)
+
+    return redirect("/login")
+
+@app.route("/resend-otp", methods=["POST"])
+def resend_otp():
+
+    email = request.form["email"]
+
+    if not get_admin_by_email(email):
+        return render_template(
+            "forgot_password.html",
+            error="Email không tồn tại."
+        )
+
+    otp = generate_otp()
+
+    save_reset_otp(email, otp)
+
+    if not send_reset_otp(email, otp):
+        return render_template(
+            "verify_otp.html",
+            email=email,
+            error="Không thể gửi OTP."
+        )
+
+    return render_template(
+        "verify_otp.html",
+        email=email,
+        error="OTP mới đã được gửi."
     )
 
 @app.route("/")

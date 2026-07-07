@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='login.css') }}">
+</head>
+
+<body class="login-page">
+
+<div class="login-box">
+
+    <h1>CV Parser</h1>
+
+    <p>Xác thực OTP</p>
+
+    <form action="/verify-otp" method="POST">
+
+        <label>Email</label>
+
+        <input
+            type="email"
+            name="email"
+            value="{{ email }}"
+            readonly>
+
+        <label>OTP</label>
+
+        <input
+            type="text"
+            name="otp"
+            maxlength="6"
+            placeholder="Nhập OTP">
+            
+
+        <button type="submit">
+            Xác nhận
+        </button>
+
+        <a href="/login" class="back-login-btn">
+            Quay lại đăng nhập
+        </a>
+
+        
+
+        {% if error %}
+        <div class="error-box">
+            {{ error }}
+        </div>
+        {% endif %}
+
+    </form>
+
+    <form action="/resend-otp" method="POST">
+
+            <input
+                type="hidden"
+                name="email"
+                value="{{ email }}">
+
+            <button class="link-button" type="submit">
+                Gửi lại OTP
+            </button>
+    </form>
+
+</div>
+
+<script>
+const resendBtn = document.getElementById("resend-btn");
+
+resendBtn.addEventListener("click", function(e) {
+
+    if (resendBtn.disabled) {
+        e.preventDefault();
+        alert("Vui lòng chờ 60 giây trước khi gửi lại OTP.");
+        return;
+    }
+
+    resendBtn.disabled = true;
+
+    setTimeout(() => {
+        resendBtn.disabled = false;
+    }, 60000);
+});
+</script>
+</body>
+
+
+</html>
