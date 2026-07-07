@@ -7,4 +7,6 @@ pydantic
 gspread
 google-api-python-client
 google-auth
+google-auth-oauthlib
+supabase
 openpyxl
