@@ -15,6 +15,8 @@ def authenticate_user(email, password):
 
     print(admins)
 
+    print("some thing go wrong")
+
     for admin in admins:
 
         if admin["email"] == email and admin["password"] == password:
