@@ -71,7 +71,10 @@ def extract_cv(text: str, job = None) -> dict:
         f"2. Vị trí ứng tuyển:\n{job_list}\n"
         "Trường job_name chỉ được phép trả về đúng MỘT vị trí trong danh sách trên.\n"
         "Nếu CV sử dụng tên vị trí khác nhưng tương đương về ý nghĩa thì ánh xạ sang vị trí phù hợp nhất trong danh sách.\n"
-        "3. Định dạng dữ liệu đầu ra hoàn toàn sạch, tuân thủ 100% JSON Schema được cung cấp.\n"
+        "3. Một vài lưu ý quan trọng:\n"
+        "   - Không được tự ý đoán mò thông tin nếu không tìm thấy trong CV. Hãy tuân thủ theo mô tả ''.\n"
+        "   - Không được thêm bất kỳ thông tin nào ngoài những gì có trong CV.\n"
+        "4. Định dạng dữ liệu đầu ra hoàn toàn sạch, tuân thủ 100% JSON Schema được cung cấp.\n"
     )
 
     if  job != "Auto Detect":
