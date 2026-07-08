@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 import gspread
-
+from zoneinfo import ZoneInfo
 from service.google_service import get_credentials
 from dotenv import load_dotenv
 
@@ -43,7 +43,7 @@ def append_candidate(candidate):
 
     row = [
 
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S"),
 
         generate_cv_id(),
 
@@ -94,7 +94,7 @@ def update_candidate(row, candidate):
 
     values = [
 
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S"),
 
         sheet.cell(row,2).value,
 

@@ -11,6 +11,7 @@ from service.sheet_service import *
 from service.drive_service import upload_cv
 from service.jobs_service import get_all_job_names
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from extensions import mail
 from auth2 import (
     authenticate_user,
@@ -421,7 +422,7 @@ def upload():
 
             position = normalize_filename(position)
 
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S")
 
             extension = os.path.splitext(filename)[1]
 
