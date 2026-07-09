@@ -9,7 +9,7 @@ load_dotenv()
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from service.google_service import get_credentials
+from service.gg_service2 import get_credentials
 
 
 
@@ -23,14 +23,15 @@ FOLDER_ID = os.getenv("FOLDER_ID")
 # ==========================
 # GOOGLE DRIVE SERVICE
 # ==========================
+def get_drive_service():
+    credentials = get_credentials()
+    service = build(
+        "drive",
+        "v3",
+        credentials=credentials
+    )
+    return service
 
-credentials = get_credentials()
-
-service = build(
-    "drive",
-    "v3",
-    credentials=credentials
-)
 
 
 def normalize_folder_name(folder_name):
@@ -57,6 +58,7 @@ def get_or_create_folder(folder_name):
         "trashed=false"
     )
 
+    service = get_drive_service()
     result = service.files().list(
         q=query,
         fields="files(id,name)"
@@ -109,6 +111,7 @@ def upload_cv(file_path, new_filename, folder_name):
         resumable=True
     )
 
+    service = get_drive_service()
     file = service.files().create(
         body=metadata,
         media_body=media,

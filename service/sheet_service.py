@@ -2,23 +2,27 @@ from datetime import datetime
 import os
 import gspread
 from zoneinfo import ZoneInfo
-from service.google_service import get_credentials
+from service.gg_service2 import get_credentials
 from dotenv import load_dotenv
 
 
 load_dotenv()
-
-
-credentials = get_credentials()
-
-client = gspread.authorize(credentials)
-
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
 WORKSHEET_NAME = os.getenv("WORKSHEET_NAME")
 
-sheet = client.open_by_key(
-    SPREADSHEET_ID
-).sheet1
+def get_sheet():
+
+    credentials = get_credentials()
+
+    client = gspread.authorize(credentials)
+
+
+
+    sheet = client.open_by_key(
+        SPREADSHEET_ID
+    ).sheet1
+
+    return sheet
 
 
 import uuid
@@ -28,6 +32,7 @@ def generate_cv_id():
 
 def find_by_email(email):
 
+    sheet = get_sheet()
     emails = sheet.col_values(6)
 
     for index, value in enumerate(emails):
@@ -86,7 +91,7 @@ def append_candidate(candidate):
         candidate["related_emails"], #SHARE_
 
     ]
-
+    sheet = get_sheet()
     sheet.append_row(row)
 
 
@@ -137,7 +142,7 @@ def update_candidate(row, candidate):
         candidate["related_emails"], #SHARE_
 
     ]
-
+    sheet = get_sheet()
     sheet.update(
 
         f"A{row}:U{row}",

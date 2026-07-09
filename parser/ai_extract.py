@@ -81,7 +81,7 @@ def extract_cv(text: str, job = None) -> dict:
         system_prompt += "Cv này đã lựa chọn chuyên ngành rồi không cần dự đoán job_name nữa."
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash-lite",
+        model="gemini-2.5-flash",
         contents=f"Nội dung văn bản CV cần xử lý:\n\n{text}",
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,

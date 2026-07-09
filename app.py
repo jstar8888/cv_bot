@@ -12,6 +12,7 @@ from service.drive_service import upload_cv
 from service.jobs_service import get_all_job_names
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from service.gg_service2 import (get_credentials, handle_google_callback, get_authorization_url) 
 from extensions import mail
 from auth2 import (
     authenticate_user,
@@ -216,6 +217,12 @@ def resend_otp():
 @app.route("/")
 def index():
 
+    creds = get_credentials()
+    if not creds:
+        redirect_uri = request.url_root.rstrip("/") + "/google/callback"
+        authorization_url = get_authorization_url(redirect_uri)
+        return redirect(authorization_url)
+
     if "email" not in session:
 
         return redirect("/login")
@@ -236,6 +243,18 @@ def index():
         job_names=job_names
 
     )
+
+@app.route("/google/callback")
+def google_callback():
+
+    redirect_uri = request.url_root.rstrip("/") + "/google/callback"
+
+    handle_google_callback(
+        authorization_response_url=request.url,
+        redirect_uri=redirect_uri
+    )
+
+    return redirect("/login")
 
 @app.route("/admin")
 def admin():
