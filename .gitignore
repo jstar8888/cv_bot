@@ -3,6 +3,6 @@ credentials/*
 
 .env
 uploads/*
-
+gg_service2.py
 __pycache__/
 *.pyc

@@ -68,7 +68,7 @@ def get_credentials():
             )
 
             creds = flow.run_local_server(port=0)
-            update_google_oauth(creds)
+            #update_google_oauth(creds)
 
             with open(TOKEN_FILE, "w") as token:
                 token.write(creds.to_json())
