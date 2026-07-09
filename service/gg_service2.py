@@ -56,19 +56,21 @@ def get_authorization_url(redirect_uri):
         prompt='consent'
     )
     
-    return authorization_url
+    return authorization_url, flow.code_verifier  # Trả về cả code_verifier để dùng trong bước callback
 
 
-def handle_google_callback(authorization_response_url, redirect_uri):
+def handle_google_callback(authorization_response_url, redirect_uri, session):
     
     flow = Flow.from_client_config(
         CLIENT_SECRET_FILE,
         scopes=SCOPES,
         redirect_uri=redirect_uri
     )
+    flow.code_verifier = session["code_verifier"]
     
     # Đổi mã code lấy Credentials
     flow.fetch_token(authorization_response=authorization_response_url)
+
     creds = flow.credentials
     
     # Lưu credentials này vào Supabase

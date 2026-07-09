@@ -220,7 +220,7 @@ def index():
     creds = get_credentials()
     if not creds:
         redirect_uri = request.url_root.rstrip("/") + "/google/callback"
-        authorization_url = get_authorization_url(redirect_uri)
+        authorization_url, session["code_verifier"] = get_authorization_url(redirect_uri)
         return redirect(authorization_url)
 
     if "email" not in session:
@@ -251,7 +251,8 @@ def google_callback():
 
     handle_google_callback(
         authorization_response_url=request.url,
-        redirect_uri=redirect_uri
+        redirect_uri=redirect_uri,
+        session=session
     )
 
     return redirect("/login")
