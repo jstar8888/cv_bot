@@ -38,7 +38,8 @@ def get_google_oauth():
 def update_google_oauth(creds):
     (
         supabase.table("secrets")
-        .update({
+        .upsert({
+            "key": "google_oauth",
             "payload": json.loads(creds.to_json())
         })
         .eq("key", "google_oauth")
@@ -68,7 +69,7 @@ def get_credentials():
             )
 
             creds = flow.run_local_server(port=0)
-            #update_google_oauth(creds)
+            update_google_oauth(creds)
 
             with open(TOKEN_FILE, "w") as token:
                 token.write(creds.to_json())
