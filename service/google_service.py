@@ -27,11 +27,13 @@ def get_google_oauth():
         supabase.table("secrets")
         .select("payload")
         .eq("key", "google_oauth")
-        .single()
         .execute()
     )
 
-    return response.data["payload"]
+    if response.data:
+        return response.data[0].get("payload")
+    else:
+        return None
 
 
 
@@ -47,31 +49,23 @@ def update_google_oauth(creds):
     )
 
 def get_credentials():
-    creds = None
-
     data = get_google_oauth()
 
-    creds = Credentials.from_authorized_user_info(
-        data,
-        SCOPES
-    )
+    if data:
+        creds = Credentials.from_authorized_user_info(data, SCOPES)
 
-    if not creds or not creds.valid:
-
-        if creds and creds.expired and creds.refresh_token:
+        if creds.expired and creds.refresh_token:
             creds.refresh(Request())
             update_google_oauth(creds)
 
-        else:
-            flow = InstalledAppFlow.from_client_config(
-                CLIENT_SECRET_FILE,
-                SCOPES
-            )
+        return creds
 
-            creds = flow.run_local_server(port=0)
-            update_google_oauth(creds)
+    # Không có dữ liệu OAuth -> đăng nhập lần đầu
+    flow = InstalledAppFlow.from_client_config(
+        CLIENT_SECRET_FILE,
+        SCOPES
+    )
 
-            with open(TOKEN_FILE, "w") as token:
-                token.write(creds.to_json())
-
+    creds = flow.run_local_server(port=0)
+    update_google_oauth(creds)
     return creds
