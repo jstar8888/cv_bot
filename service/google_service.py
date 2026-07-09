@@ -44,7 +44,6 @@ def update_google_oauth(creds):
             "key": "google_oauth",
             "payload": json.loads(creds.to_json())
         })
-        .eq("key", "google_oauth")
         .execute()
     )
 
