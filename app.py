@@ -6,7 +6,7 @@ from flask import request
 from flask import redirect
 from werkzeug.utils import secure_filename
 from parser.extractor import extract_text
-from parser.ai_extract import extract_cv
+from parser.ai_extract2 import extract_cv
 from service.sheet_service import *
 from service.drive_service import upload_cv
 from service.jobs_service import get_all_job_names
@@ -24,8 +24,8 @@ from auth2 import (
     add_shared_email,
     delete_shared_email,
     update_shared_email,
-    get_admin_by_email,
-    update_admin_password,
+    get_user_by_email,
+    update_user_password,
     save_reset_otp,
     verify_reset_otp,
     delete_reset_otp
@@ -93,16 +93,31 @@ def do_login():
     user = authenticate_user(email, password)
 
     if user:
+        otp = generate_otp()
+
+        save_reset_otp(email, otp)
+
+        if not send_reset_otp(email, otp):
+            return render_template(
+                "login.html",
+                error="Không thể gửi OTP. Vui lòng thử lại."
+            )
+        
 
         session["email"] = user["email"]
-        session["name"] = user["name"]
 
         if user["role"] == "admin":
             session["role"] = "admin"
-            return redirect("/admin")
+            
+        else:
+            session["role"] = "hr"
+        
 
-        session["role"] = "hr"
-        return redirect("/")
+        return render_template(
+            "verify_otp.html",
+            email=email,
+            purpose="login"
+    )
 
     return render_template(
         "login.html",
@@ -118,12 +133,12 @@ def forgot_password():
 
     email = request.form["email"]
 
-    user = get_admin_by_email(email)
+    user = get_user_by_email(email)
 
     if not user:
         return render_template(
             "forgot_password.html",
-            error="Email admin không tồn tại."
+            error="Email không tồn tại."
         )
 
     otp = generate_otp()
@@ -138,12 +153,14 @@ def forgot_password():
 
     return render_template(
         "verify_otp.html",
-        email=email
+        email=email,
+        purpose="reset"
     )
 
 @app.route("/verify-otp", methods=["POST"])
 def verify_otp():
 
+    purpose = request.form["purpose"]
     email = request.form["email"]
     otp = request.form["otp"]
 
@@ -151,16 +168,26 @@ def verify_otp():
         return render_template(
             "verify_otp.html",
             email=email,
-            error="OTP không đúng hoặc đã hết hạn."
+            purpose=purpose,
+            error="OTP không đúng."
         )
 
-    session["reset_email"] = email
+    if purpose == "reset":
 
-    return render_template(
-        "reset_password.html",
-        email=email
-    )
+        session["reset_email"] = email
 
+        return render_template(
+            "reset_password.html",
+            email=email
+        )
+
+    elif purpose == "login":
+        print(session["role"])
+        if session["role"] == "admin":
+            return redirect("/admin")
+
+        return redirect("/")
+    
 @app.route("/reset-password", methods=["POST"])
 def reset_password():
 
@@ -178,7 +205,7 @@ def reset_password():
             error="Mật khẩu xác nhận không khớp."
         )
 
-    update_admin_password(email, password)
+    update_user_password(email, password)
 
     delete_reset_otp(email)
 
@@ -191,7 +218,7 @@ def resend_otp():
 
     email = request.form["email"]
 
-    if not get_admin_by_email(email):
+    if not get_user_by_email(email):
         return render_template(
             "forgot_password.html",
             error="Email không tồn tại."
@@ -236,8 +263,6 @@ def index():
 
         email=session["email"],
 
-        name=session["name"],
-
         related_emails=related_emails,
 
         job_names=job_names
@@ -281,11 +306,10 @@ def admin_hr_add():
     if session.get("role") != "admin":
         return "Permission Denied"
 
-    name = request.form["name"]
     email = request.form["email"]
     password = request.form["password"]
 
-    add_hr(email, password, name)
+    add_hr(email, password)
 
     return redirect("/admin")
 
@@ -328,11 +352,11 @@ def admin_hr_update():
     if session.get("role") != "admin":
         return "Permission Denied"
 
-    email = request.form["email"]
-    name = request.form["name"]
+    old_email = request.form.get("old_email") or request.form.get("email")
+    new_email = request.form.get("new_email") or request.form.get("email")
     password = request.form["password"]
 
-    update_hr(email, password, name)
+    update_hr(old_email, new_email, password)
 
     return redirect("/admin")
 

@@ -22,7 +22,7 @@
 
             <h2>Admin Management</h2>
 
-            <p>Xin chào {{ session["name"] }}</p>
+            <p>Xin chào {{ session["email"] }}</p>
 
         </div>
 
@@ -75,12 +75,6 @@
                 method="POST">
 
                 <input
-                    type="text"
-                    name="name"
-                    placeholder="Họ tên"
-                    required>
-
-                <input
                     type="email"
                     name="email"
                     placeholder="Email"
@@ -92,11 +86,7 @@
                     placeholder="Mật khẩu"
                     required>
 
-                <button type="submit">
-
-                    Thêm HR
-
-                </button>
+                <button type="submit">Thêm HR</button>
 
             </form>
 
@@ -113,8 +103,6 @@
                 <tr>
 
                     <th>STT</th>
-
-                    <th>Họ tên</th>
 
                     <th>Email</th>
 
@@ -134,8 +122,6 @@
 
                     <td>{{ loop.index }}</td>
 
-                    <td>{{ hr.name }}</td>
-
                     <td>{{ hr.email }}</td>
 
                     <td>{{ hr.password }}</td>
@@ -144,11 +130,7 @@
 
                         <button
                             class="edit-btn"
-                            onclick="openEditHR(
-                                '{{ hr.name }}',
-                                '{{ hr.email }}',
-                                '{{ hr.password }}'
-                            )">
+                            onclick="openEditHR('{{ hr.email }}','{{ hr.password }}')">
 
                             Sửa
 
@@ -197,11 +179,7 @@
                     placeholder="Email"
                     required>
 
-                <button type="submit">
-
-                    Thêm Email
-
-                </button>
+                <button type="submit">Thêm Email</button>
 
             </form>
 
@@ -241,9 +219,7 @@
 
                         <button
                             class="edit-btn"
-                            onclick="openEditEmail(
-                                '{{ item.email }}'
-                            )">
+                            onclick="openEditEmail('{{ item.email }}')">
 
                             Sửa
 
@@ -284,21 +260,21 @@
                 action="/admin/hr/update"
                 method="POST">
 
-                <label>Họ tên</label>
+                <label>Email cũ</label>
 
                 <input
-                    id="edit_hr_name"
-                    type="text"
-                    name="name"
-                    required>
-
-                <label>Email</label>
-
-                <input
-                    id="edit_hr_email"
+                    id="edit_hr_old_email"
                     type="email"
-                    name="email"
+                    name="old_email"
                     readonly>
+
+                <label>Email mới</label>
+
+                <input
+                    id="edit_hr_new_email"
+                    type="email"
+                    name="new_email"
+                    required>
 
                 <label>Mật khẩu</label>
 
@@ -310,19 +286,11 @@
 
                 <br><br>
 
-                <button type="submit">
-
-                    Lưu
-
-                </button>
+                <button type="submit">Lưu</button>
 
                 <button
                     type="button"
-                    onclick="closeEditHR()">
-
-                    Hủy
-
-                </button>
+                    onclick="closeEditHR()">Hủy</button>
 
             </form>
 
@@ -360,19 +328,11 @@
 
                 <br><br>
 
-                <button type="submit">
-
-                    Lưu
-
-                </button>
+                <button type="submit">Lưu</button>
 
                 <button
                     type="button"
-                    onclick="closeEditEmail()">
-
-                    Hủy
-
-                </button>
+                    onclick="closeEditEmail()">Hủy</button>
 
             </form>
 
@@ -414,11 +374,11 @@ function showTab(id, btn){
 
 // ====================== HR ======================
 
-function openEditHR(name,email,password){
+function openEditHR(email,password){
 
-    document.getElementById("edit_hr_name").value=name;
+    document.getElementById("edit_hr_old_email").value=email;
 
-    document.getElementById("edit_hr_email").value=email;
+    document.getElementById("edit_hr_new_email").value=email;
 
     document.getElementById("edit_hr_password").value=password;
 

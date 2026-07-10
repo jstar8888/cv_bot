@@ -2,42 +2,29 @@ from database import supabase
 from datetime import datetime, timedelta
 
 def authenticate_user(email, password):
-
-    admin = (
-        supabase.table("admin")
+    response = (
+        supabase.table("users")
         .select("*")
         .eq("email", email)
         .eq("password", password)
+        .limit(1)
         .execute()
     )
 
-    if admin.data:
-
-        user = admin.data[0]
-        user["role"] = "admin"
-
-        return user
-
-    hr = (
-        supabase.table("hr")
-        .select("*")
-        .eq("email", email)
-        .eq("password", password)
-        .execute()
-    )
-
-    if hr.data:
-
-        user = hr.data[0]
-        user["role"] = "hr"
-
+    if response.data:
+        user = response.data[0]
+        # ensure role exists (default to 'user' if not set)
+        user["role"] = user.get("role", "user")
         return user
 
     return None
 
-def get_admin_by_email(email):
+
+
+
+def get_user_by_email(email):
     response = (
-        supabase.table("admin")
+        supabase.table("users")
         .select("*")
         .eq("email", email)
         .limit(1)
@@ -49,9 +36,10 @@ def get_admin_by_email(email):
 
     return None
 
-def update_admin_password(email, new_password):
+
+def update_user_password(email, new_password):
     response = (
-        supabase.table("admin")
+        supabase.table("users")
         .update({"password": new_password})
         .eq("email", email)
         .execute()
@@ -118,47 +106,48 @@ def delete_reset_otp(email):
 
     return len(response.data) > 0
 
-def add_hr(email, password, name):
-
+def add_hr(email, password):
+    # insert into unified `user` table and set role to 'hr'
     (
-        supabase.table("hr")
+        supabase.table("users")
         .insert({
             "email": email,
             "password": password,
-            "name": name
+            "role": "hr"
         })
         .execute()
     )
 
 
 def load_hr():
-
     response = (
-        supabase.table("hr")
+        supabase.table("users")
         .select("*")
+        .eq("role", "hr")
         .execute()
     )
 
     return response.data
 
 def delete_hr(email):
-
     (
-        supabase.table("hr")
+        supabase.table("users")
         .delete()
         .eq("email", email)
+        .eq("role", "hr")
         .execute()
     )
 
-def update_hr(email, password, name):
-
+def update_hr(old_email, new_email, password):
+    # update email and password for hr in unified `user` table
     (
-        supabase.table("hr")
+        supabase.table("users")
         .update({
-            "password": password,
-            "name": name
+            "email": new_email,
+            "password": password
         })
-        .eq("email", email)
+        .eq("email", old_email)
+        .eq("role", "hr")
         .execute()
     )
 

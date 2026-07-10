@@ -18,9 +18,9 @@ def get_sheet():
 
 
 
-    sheet = client.open_by_key(
-        SPREADSHEET_ID
-    ).sheet1
+    spreadsheet = client.open_by_key(SPREADSHEET_ID)
+    print(WORKSHEET_NAME)
+    sheet = spreadsheet.worksheet(WORKSHEET_NAME)
 
     return sheet
 
