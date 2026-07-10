@@ -14,7 +14,7 @@ def send_reset_otp(email, otp):
         msg.body = f"""
 Xin chào,
 
-Bạn đã yêu cầu đặt lại mật khẩu.
+Bạn đã sử dụng dịch vụ OTP
 
 Mã OTP của bạn là:
 

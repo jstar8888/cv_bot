@@ -19,7 +19,7 @@ def get_sheet():
 
 
     spreadsheet = client.open_by_key(SPREADSHEET_ID)
-    print(WORKSHEET_NAME)
+    
     sheet = spreadsheet.worksheet(WORKSHEET_NAME)
 
     return sheet
@@ -46,6 +46,7 @@ def find_by_email(email):
 
 def append_candidate(candidate):
 
+    sheet = get_sheet()
     row = [
 
         datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S"),
@@ -91,12 +92,13 @@ def append_candidate(candidate):
         candidate["related_emails"], #SHARE_
 
     ]
-    sheet = get_sheet()
+    
     sheet.append_row(row)
 
 
 def update_candidate(row, candidate):
 
+    sheet = get_sheet()
     values = [
 
         datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S"),
@@ -142,7 +144,7 @@ def update_candidate(row, candidate):
         candidate["related_emails"], #SHARE_
 
     ]
-    sheet = get_sheet()
+    
     sheet.update(
 
         f"A{row}:U{row}",
