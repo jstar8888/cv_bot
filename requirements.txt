@@ -11,3 +11,4 @@ google-auth-oauthlib
 supabase
 openpyxl
 flask_mail
+openai
