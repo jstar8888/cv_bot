@@ -6,7 +6,7 @@ from flask import request
 from flask import redirect
 from werkzeug.utils import secure_filename
 from parser.extractor import extract_text
-from parser.ai_extract2 import extract_cv
+from parser.ai_extract import extract_cv
 from service.sheet_service import *
 from service.drive_service import upload_cv
 from service.jobs_service import get_all_job_names
