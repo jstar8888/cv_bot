@@ -85,6 +85,7 @@ def extract_cv(text: str, job=None) -> dict:
         "3. Một vài lưu ý quan trọng:\n"
         "   - Không được tự ý đoán mò thông tin nếu không tìm thấy trong CV.\n"
         "   - Không được thêm bất kỳ thông tin nào ngoài những gì có trong CV.\n"
+        "   - Trong mục skills chia rõ làm Tech skills và Other skill nếu cv có nhiều loại skill.\n"
         "4. Định dạng dữ liệu đầu ra hoàn toàn sạch, tuân thủ 100% JSON Schema được cung cấp.\n"
     )
 
