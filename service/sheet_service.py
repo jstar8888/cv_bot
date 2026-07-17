@@ -83,9 +83,9 @@ def append_candidate(candidate):
 
         candidate["uploader_email"], #HR_USER
 
-        "", #NOTET
-
         candidate["skills"],
+
+        "", #NOTET
 
         "", #ID_RECRUITMENT
 
@@ -135,9 +135,9 @@ def update_candidate(row, candidate):
 
         candidate["uploader_email"], #HR_USER
 
-        "", #NOTET
-
         candidate["skills"],
+
+        "", #NOTET
 
         "", #ID_RECRUITMENT
 
