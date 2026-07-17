@@ -482,6 +482,11 @@ def upload():
 
             candidate["uploader_email"] = session["email"]
 
+            all_related_emails = related_emails.copy()
+
+            if session["email"] not in all_related_emails:
+                all_related_emails.append(session["email"])
+
             candidate["related_emails"] = "\n".join(
                 related_emails
             )
