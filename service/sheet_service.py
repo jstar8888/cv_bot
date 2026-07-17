@@ -49,7 +49,7 @@ def append_candidate(candidate):
     sheet = get_sheet()
     row = [
 
-        datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S"),
+        datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%d/%m/%Y"),
 
         generate_cv_id(),
 
@@ -101,7 +101,7 @@ def update_candidate(row, candidate):
     sheet = get_sheet()
     values = [
 
-        datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S"),
+        datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%d/%m/%Y"),
 
         sheet.cell(row,2).value,
 
