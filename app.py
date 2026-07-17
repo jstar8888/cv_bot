@@ -487,7 +487,7 @@ def upload():
             if session["email"] not in all_related_emails:
                 all_related_emails.append(session["email"])
 
-            candidate["related_emails"] = ", ".join(related_emails)
+            candidate["related_emails"] = ", ".join(all_related_emails)
 
             row = find_by_email(candidate["email"])
 
