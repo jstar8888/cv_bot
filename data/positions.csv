@@ -1,84 +1,124 @@
 code,position
-1, Thực tập Tester	TTS Tester
-2,	Junior Tester	
-3,	Senior Tester	
-4,	Test Lead	
-7,	Manual Tester	
-8,	DE	
-9,	DEV Mobile IOS Android	
-10,	SEO Marketing	
-11,	DA	
-12,	AWS Engineer	
-13,	Data Scientist	
-14,	Data Brick	
-15,	Automation Tester	
-16,	BA	
-18,	Dev Java	
-17,	Lập trình Front End	
-19,	DevOps	
-20,	IT-Network	
-21,	Bigdata Engineer	
-22,	IT - System	
-23,	IT - Service Desk	
-24,	AI	
-25,	Software Engineer	
-26,	Sale	
-27,	DS	
-28,	BO	
-29,	Chuyên viên Quản lý đào tạo	
-30,	BA Ngân hàng	
-31,	SQL DATABASE DEVELOPER	
-32,	Intern/Fresher Marketing	
-33,	Power Apps Developer	
-34,	AWS Data Engineer	
-35,	Tuyển dụng	
-36,	Thực tập sinh IT	
-37,	Technical Project Manager	
-38,	Web Developer	
-39,	Fullstack Developer	
-40,	Marketing	
-41,	PHP Developer	
-42,	Flutter	
-43,	Chuyên viên Quản trị dữ liệu	
-44,	Lập trình PHP	
-45,	Sale B2B	
-46,	Thực tập Data Product	
-47,	Kế toán Tổng hợp	
-48,	Trợ lý giám đốc	
-49,	Account Manager	
-50,	Trợ lý dự án	
-51,	Lập trình Backend	
-52,	Salesforce BA	
-53,	Salesforce Developer	
-54,	DE BI Lead	
-55,	Thực tập sinh Kế toán	
-56,	Nhân viên Hành chính	
-57,	Sale Admin	
-58,	Thực tập sinh Truyền thông nội bộ	
-59,	DBA	
-60,	Digital Marketing	
-61,	UI UX Designer	
-62,	Tester Data	
-63,	ERP - Dynamic 365	
-64,	Dynamics 365 CRM	
-65,	Partnership Executive	
-66,	Business Intelligence	
-67,	Microsoft AD/Azure	
-68,	ASP.NET	
-69,	Project Manager	
-70,	Microsoft D365 Technical	
-71,	Cloud Engineer	
-72,	Ruby dev	
-73,	Techlead Java	
-74,	Tester bank	
-75,	.Net	
-76,	Frontend DEV	
-77,	Azuze DevOps	
-78,	Dev ERP	
-79,	SAP Dev	
-80,	Junior Dev	
-81,	Giảng viên	
-82,	Oracle Engineer	
-83,	IT Manager	
-84, BIM	
-85, Nhân viên Phát triển Kinh Doanh			
+1,Thực tập Tester	
+2,Junior Tester	
+3,Senior Tester	
+4,Test Lead	
+5,Manual Tester	
+6,DE	
+7,DEV Mobile IOS Android	
+8,SEO Marketing	
+9,DA	
+10,AWS Engineer	
+11,Data Scientist	
+12,Data Brick	
+13,Automation Tester	
+14,BA	
+15,Dev Java	
+16,Lập trình Front End	
+17,DevOps	
+18,IT-Network	
+19,Bigdata Engineer	
+20,IT - System	
+21,IT - Service Desk	
+22,AI	
+23,Software Engineer
+24,Sale
+25,DS
+26,BO
+27,Chuyên viên Quản lý đào tạo
+28,BA Ngân hàng
+29,SQL DATABASE DEVELOPER
+30,Intern/Fresher Marketing	TTS Marketing
+31,Power Apps Developer
+32,AWS Data Engineer
+33,Tuyển dụng
+34,Thực tập sinh IT
+35,Technical Project Manager
+36,Web Developer
+37,Fullstack Developer
+38,Marketing
+39,PHP Developer
+40,Flutter
+41,Chuyên viên Quản trị dữ liệu
+42,Lập trình PHP
+43,Sale B2B
+44,Thực tập Data Product
+45,Kế toán Tổng hợp
+46,Trợ lý giám đốc
+47,Account Manager
+48,Trợ lý dự án
+49,Lập trình Backend
+50,Salesforce BA	BA Salesforce
+51,Salesforce Developer
+52,DE BI Lead
+53,Thực tập sinh Kế toán	TTS Kế toán
+54,Nhân viên Hành chính
+55,Sale Admin
+56,Thực tập sinh Truyền thông nội bộ	TTS TTNB
+57,DBA
+58,Digital Marketing
+59,UI UX Designer
+60,Tester Data
+61,ERP - Dynamic 365
+62,Dynamics 365 CRM
+63,Partnership Executive
+64,Business Intelligence
+65,Microsoft AD/Azure
+66,ASP.NET
+67,Project Manager
+68,Microsoft D365 Technical
+69,Cloud Engineer
+70,Ruby dev
+71,Techlead Java
+72,Tester bank
+73,.Net
+74,Frontend DEV
+75,Azuze DevOps
+76,Dev ERP
+77,SAP Dev
+78,Junior Dev
+79,Giảng viên
+80,Oracle Engineer
+81,IT Manager
+82,BIM
+83,Nhân viên Phát triển Kinh Doanh
+84,Giám Đốc Vận Hành - COO
+85,Data Analyst
+86,Android Dev
+87,AWS Cloud Solution Architect
+88,TTS HCNS
+89,Java Developer
+90,Android Developer
+91,Thực tập sinh Marketing
+92,Thực tập sinh Digital
+93,Fullstack
+94,Technical Support
+95,Tech Support Remote
+96,PMO remote
+97,BA Quản lý tài sản bảo đảm
+98,AI Engineer
+99,Data Engineer
+100,QA
+101,IOS Dev
+102,Androi Engineer
+103,Performance tester
+104,Thực tập sinh trợ lý dự án
+105,Backend Dev .Net/Java (DE)
+106,Quản Lí Đào Tạo
+107,Quản lý lớp học
+108,Thực tập sinh DA
+109,Thực tập sinh AI Engineer
+110,TTS BA
+111,T24 Developer
+112,Backend Dev .Net (DE)
+113,Backend Dev Java (DE)
+114,Backend Python
+115,Vue JS Developer
+116,BA ERP
+117,DA ERP
+118,TTS BD
+119,TTS Trợ lý giám đốc
+120,Business Development
+121,Intern Business Development
+122,Kế toán
+123,Hybrid Infrastructure (Linux/Azure/Automation)
