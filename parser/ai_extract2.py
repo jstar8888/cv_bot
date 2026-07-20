@@ -15,14 +15,14 @@ client = OpenAI(
 
 
 class CVStructure(BaseModel):
-    full_name: str = Field(
+   full_name: str = Field(
     description=(
-        "Họ và tên đầy đủ của ứng viên. "
-        "Ưu tiên lấy ở phần đầu CV, thường là dòng đầu tiên hoặc dòng có cỡ chữ lớn nhất. "
-        "Loại bỏ các tiêu đề như 'CV', 'Resume', 'Curriculum Vitae'. "
-        "Không lấy tên công ty, tên trường học hoặc tên người tham chiếu. "
-        "Nếu tên không có dấu nhưng có thể xác định rõ thì chuyển về tiếng Việt có dấu. "
-        "Nếu có nhiều tên thì chọn tên của ứng viên."
+        "Họ tên đầy đủ của ứng viên. "
+        "Nếu phát hiện chuỗi bị lỗi mã hóa UTF-8 (mojibake) như "
+        "'NGUYÄN', 'HOÃNG', 'TRÁN', "
+        "hãy tự khôi phục về tiếng Việt đúng nếu có thể. "
+        "Ví dụ: 'NGUYÄN N HOÀNG GIANG' → 'Nguyễn Hoàng Giang'. "
+        "Nếu không thể khôi phục chính xác thì giữ nguyên chuỗi gốc."
     )
 )
 
