@@ -16,77 +16,106 @@ client = OpenAI(
 
 class CVStructure(BaseModel):
     full_name: str = Field(
-        description=(
-            "Họ tên ứng viên. Nguyên tắc: Nằm ở dòng đầu tiên hoặc font chữ lớn nhất ở đầu trang 1. "
-            "Loại trừ các từ tiêu đề như 'Curriculum Vitae', 'Resume', 'CV'. "
-            "Lấy chuỗi Title Case hoặc UPPER CASE ở top header."
-        )
+    description=(
+        "Họ và tên đầy đủ của ứng viên. "
+        "Ưu tiên lấy ở phần đầu CV, thường là dòng đầu tiên hoặc dòng có cỡ chữ lớn nhất. "
+        "Loại bỏ các tiêu đề như 'CV', 'Resume', 'Curriculum Vitae'. "
+        "Không lấy tên công ty, tên trường học hoặc tên người tham chiếu. "
+        "Nếu tên không có dấu nhưng có thể xác định rõ thì chuyển về tiếng Việt có dấu. "
+        "Nếu có nhiều tên thì chọn tên của ứng viên."
     )
+)
 
-    gender: Literal["Nam", "Nữ", "Không rõ"] = Field(
-        description=(
-            "Tìm từ khóa định danh: 'Male'/'Female'/'Nam'/'Nữ'. "
-            "Không thấy thì trả về 'Không rõ'. "
-            "TUYỆT ĐỐI không đoán giới tính dựa trên tên."
-        )
+gender: Literal["Nam", "Nữ", "Không rõ"] = Field(
+    description=(
+        "Chỉ trả về 'Nam', 'Nữ' hoặc 'Không rõ'. "
+        "Ưu tiên tìm các trường 'Gender', 'Giới tính', 'Male', 'Female', 'Nam', 'Nữ'. "
+        "Nếu CV không ghi rõ thì trả về 'Không rõ'. "
+        "Không được suy đoán giới tính dựa trên tên."
     )
+)
 
-    email: str = Field(
-        description="Địa chỉ email chuẩn."
+email: str = Field(
+    description=(
+        "Địa chỉ email của ứng viên. "
+        "Ưu tiên email cá nhân. "
+        "Nếu có nhiều email thì lấy email đầu tiên dùng để liên hệ. "
+        "Nếu không có thì trả về chuỗi rỗng."
     )
+)
 
-    phone: str = Field(
-        description=(
-            "Số điện thoại 10-15 ký tự. "
-            "Loại bỏ khoảng trắng, -, (), chỉ giữ số và dấu + ở đầu."
-        )
+phone: str = Field(
+    description=(
+        "Số điện thoại của ứng viên. "
+        "Loại bỏ khoảng trắng, dấu '-', '.', '()'. "
+        "Nếu bắt đầu bằng '+84' thì chuyển thành '0'. "
+        "Nếu bắt đầu bằng '84' thì chuyển thành '0'. "
+        "Ví dụ: +84912345678 -> 0912345678. "
+        "Nếu không có thì trả về chuỗi rỗng."
     )
+)
 
-    city: str = Field(
-        description=(
-            "Thành phố/Tỉnh thành tại Việt Nam. "
-            "Ưu tiên Header/Contact Info, sau đó Experience gần nhất."
-        )
+city: str = Field(
+    description=(
+        "Chỉ lấy tên tỉnh hoặc thành phố nơi ở của ứng viên. "
+        "Ưu tiên mục Address hoặc Contact Information. "
+        "Không lấy số nhà, đường, phường, quận. "
+        "Ví dụ: '123 Nguyễn Trãi, Thanh Xuân, Hà Nội' chỉ trả về 'Hà Nội'. "
+        "Nếu không có thì trả về chuỗi rỗng."
     )
+)
 
-    job_name: str = Field(
-        description=(
-            "Vị trí ứng tuyển thích hợp. "
-            "Phải ánh xạ về đúng danh sách vị trí được cung cấp."
-        )
+job_name: str = Field(
+    description=(
+        "Vị trí ứng tuyển của ứng viên. "
+        "BẮT BUỘC phải ánh xạ chính xác về MỘT vị trí trong danh sách Job được cung cấp. "
+        "Không được sinh thêm vị trí mới. "
+        "Ưu tiên tìm ở Header, Objective, Career Objective, Desired Position. "
+        "Nếu không có thì lấy chức danh gần nhất trong Experience rồi ánh xạ sang danh sách Job."
     )
+)
 
-    exp: Literal[
-        "Chưa có kinh nghiệm",
-        "Dưới 1 năm kinh nghiệm",
-        "Từ 1-3 năm kinh nghiệm",
-        "Từ 3-5 năm kinh nghiệm",
-        "Trên 5 năm kinh nghiệm",
-    ] = Field(
-        description=(
-            "Tổng thời gian của tất cả vị trí được đánh giá là phù hợp "
-            "với Job_Name."
-        )
+exp: Literal[
+    "Chưa có kinh nghiệm",
+    "Dưới 1 năm kinh nghiệm",
+    "Từ 1-3 năm kinh nghiệm",
+    "Từ 3-5 năm kinh nghiệm",
+    "Trên 5 năm kinh nghiệm",
+] = Field(
+    description=(
+        "Tổng số năm kinh nghiệm phù hợp với job_name. "
+        "Đọc toàn bộ mục Experience hoặc Work Experience. "
+        "Nhận diện mọi khoảng thời gian dạng MM/YYYY-MM/YYYY, YYYY-YYYY, Present hoặc Now. "
+        "Nếu khoảng thời gian chồng lắp thì hợp nhất và không tính trùng. "
+        "Chỉ cộng các công việc phù hợp với job_name. "
+        "Không tính thời gian học đại học, thực hành, khóa học hoặc project cá nhân nếu không phải kinh nghiệm làm việc."
     )
+)
 
-    exp_bank: Literal[
-        "Chưa có kinh nghiệm",
-        "Dưới 1 năm kinh nghiệm",
-        "Từ 1-3 năm kinh nghiệm",
-        "Từ 3-5 năm kinh nghiệm",
-        "Trên 5 năm kinh nghiệm",
-    ] = Field(
-        description=(
-            "Chỉ tính kinh nghiệm tại Ngân hàng, Chứng khoán hoặc Bảo hiểm."
-        )
+exp_bank: Literal[
+    "Chưa có kinh nghiệm",
+    "Dưới 1 năm kinh nghiệm",
+    "Từ 1-3 năm kinh nghiệm",
+    "Từ 3-5 năm kinh nghiệm",
+    "Trên 5 năm kinh nghiệm",
+] = Field(
+    description=(
+        "Chỉ tính kinh nghiệm tại Ngân hàng, Công ty Tài chính, Chứng khoán, Bảo hiểm hoặc Fintech. "
+        "Bao gồm cả trường hợp ứng viên làm dự án cho ngân hàng như 'Project tại Techcombank', "
+        "'Khách hàng BIDV', 'Core Banking tại VPBank', 'Tester dự án MSB'. "
+        "Không tính các công ty CNTT thông thường nếu không có khách hàng hoặc dự án thuộc lĩnh vực tài chính."
     )
+)
 
-    skills: str = Field(
-        description=(
-            "Quét mục Skills/Technologies và Project. "
-            "Nếu có nhiều loại thì chia rõ Tech Skills và Other Skills."
-        )
+skills: str = Field(
+    description=(
+        "Trích xuất kỹ năng kỹ thuật của ứng viên. "
+        "Ưu tiên mục Skills, Technical Skills, Technologies, Tech Stack hoặc Project. "
+        "Chỉ lấy công nghệ, framework, database, cloud, ngôn ngữ lập trình, công cụ và nền tảng. "
+        "Không lấy kỹ năng mềm như Teamwork, Communication, Leadership. "
+        "Nếu CV có nhiều nhóm thì gộp thành một danh sách kỹ năng kỹ thuật."
     )
+)
 
 
 def extract_cv(text: str, job=None) -> dict:
