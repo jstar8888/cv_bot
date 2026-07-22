@@ -190,3 +190,100 @@ def update_shared_email(old_email, new_email):
         .eq("email", old_email)
         .execute()
     )
+
+
+
+
+
+def save_cv_log(
+    uploader_email,
+    candidate_name,
+    job_position,
+    status
+):
+
+    data = {
+
+        "uploader_email": uploader_email,
+
+        "candidate_name": candidate_name,
+
+        "job_position": job_position,
+
+        "status": status
+
+    }
+
+
+    supabase.table(
+        "cv_upload_logs"
+    ).insert(
+        data
+    ).execute()
+
+
+from datetime import datetime, time
+from zoneinfo import ZoneInfo
+
+
+def get_today_logs(email):
+
+    timezone = ZoneInfo(
+        "Asia/Ho_Chi_Minh"
+    )
+
+    utc = ZoneInfo(
+        "UTC"
+    )
+
+
+    today = datetime.now(timezone).date()
+
+
+    # 00:00:00 giờ Việt Nam
+    start_time = datetime.combine(
+        today,
+        time.min,
+        tzinfo=timezone
+    )
+
+
+    # 23:59:59 giờ Việt Nam
+    end_time = datetime.combine(
+        today,
+        time.max,
+        tzinfo=timezone
+    )
+
+
+    # đổi sang UTC trước khi query Supabase
+
+    start_utc = start_time.astimezone(utc)
+
+    end_utc = end_time.astimezone(utc)
+
+
+    result = supabase.table(
+        "cv_upload_logs"
+    )\
+    .select("*")\
+    .eq(
+        "uploader_email",
+        email
+    )\
+    .gte(
+        "created_at",
+        start_utc.isoformat()
+    )\
+    .lte(
+        "created_at",
+        end_utc.isoformat()
+    )\
+    .order(
+        "created_at",
+        desc=True
+    )\
+    .execute()
+
+
+    return result.data
