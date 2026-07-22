@@ -6,7 +6,7 @@ from flask import request
 from flask import redirect
 from werkzeug.utils import secure_filename
 from parser.extractor import extract_text
-from parser.ai_extract2 import extract_cv
+from parser.ai_extract import extract_cv
 from service.sheet_service import *
 from service.drive_service import upload_cv
 from service.jobs_service import get_all_job_names
@@ -16,6 +16,7 @@ from service.gg_service2 import (get_credentials, handle_google_callback, get_au
 from extensions import mail
 from auth2 import (
     authenticate_user,
+    get_today_logs,
     load_hr,
     add_hr,
     delete_hr,
@@ -28,7 +29,8 @@ from auth2 import (
     update_user_password,
     save_reset_otp,
     verify_reset_otp,
-    delete_reset_otp
+    delete_reset_otp,
+    save_cv_log
 )
 from service.mail_service import (send_reset_otp, generate_otp)
 
@@ -256,6 +258,7 @@ def index():
     
     related_emails = load_shared_email()
     job_names = get_all_job_names()
+    logs = get_today_logs(session["email"])
 
     return render_template(
 
@@ -265,7 +268,9 @@ def index():
 
         related_emails=related_emails,
 
-        job_names=job_names
+        job_names=job_names,
+
+        upload_logs=logs
 
     )
 
@@ -495,12 +500,36 @@ def upload():
                 append_candidate(candidate)
             else:
                 update_candidate(row, candidate)
+            
+            save_cv_log(
+
+                uploader_email=session["email"],
+
+                candidate_name=candidate["full_name"],
+
+                job_position=candidate["job_name"],
+
+                status="SUCCESS"
+
+            )
 
             success_count += 1
 
         except Exception as e:
 
             print(e)
+
+            save_cv_log(
+
+                uploader_email=session["email"],
+
+                candidate_name=candidate["full_name"],
+
+                job_position=candidate["job_name"],
+
+                status="FAIL"
+
+            )
 
             failed_files.append(
                 f"{file.filename}: {str(e)}"
