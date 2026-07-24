@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from parser.extractor import extract_text
 from parser.ai_extract2 import extract_cv
 from service.sheet_service import *
-from service.drive_service import upload_cv
+from service.drive_service import *
 from service.jobs_service import get_all_job_names
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -442,6 +442,8 @@ def upload():
 
     success_count = 0
     failed_files = []
+    drive_service = get_drive_service()
+    sheet_target = get_sheet()
 
     for file in files:
 
@@ -480,7 +482,8 @@ def upload():
             drive_link = upload_cv(
                 save_path,
                 new_filename,
-                position
+                position,
+                drive_service
             )
 
             candidate["drive_link"] = drive_link
@@ -494,12 +497,12 @@ def upload():
 
             candidate["related_emails"] = ", ".join(all_related_emails)
 
-            row = find_by_email(candidate["email"])
+            row = find_by_email(candidate["email"],sheet_target)
 
             if row is None:
-                append_candidate(candidate)
+                append_candidate(candidate,sheet_target)
             else:
-                update_candidate(row, candidate)
+                update_candidate(row, candidate,sheet_target)
             
             save_cv_log(
 
