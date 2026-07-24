@@ -151,7 +151,7 @@ def process_single_cv(file, selected_job, related_emails, drive_service, uploade
     emails = related_emails.copy()
 
     if uploader_email not in emails:
-        emails.append(session["email"])
+        emails.append(uploader_email)
 
 
     candidate["related_emails"] = ", ".join(emails)
