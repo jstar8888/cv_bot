@@ -47,7 +47,7 @@ def normalize_folder_name(folder_name):
     return folder_name
 
 
-def get_or_create_folder(folder_name):
+def get_or_create_folder(folder_name,drive_service):
 
     folder_name = normalize_folder_name(folder_name)
 
@@ -58,8 +58,8 @@ def get_or_create_folder(folder_name):
         "trashed=false"
     )
 
-    service = get_drive_service()
-    result = service.files().list(
+
+    result = drive_service.files().list(
         q=query,
         fields="files(id,name)"
     ).execute()
@@ -80,7 +80,7 @@ def get_or_create_folder(folder_name):
 
     }
 
-    folder = service.files().create(
+    folder = drive_service.files().create(
 
         body=metadata,
 
@@ -97,9 +97,9 @@ def get_or_create_folder(folder_name):
 # UPLOAD FILE
 # ==========================
 
-def upload_cv(file_path, new_filename, folder_name):
+def upload_cv(file_path, new_filename, folder_name, drive_service):
    
-    folder_id = get_or_create_folder(folder_name)
+    folder_id = get_or_create_folder(folder_name,drive_service)
 
     metadata = {
         "name": new_filename,
@@ -111,8 +111,8 @@ def upload_cv(file_path, new_filename, folder_name):
         resumable=True
     )
 
-    service = get_drive_service()
-    file = service.files().create(
+    
+    file = drive_service.files().create(
         body=metadata,
         media_body=media,
         fields="id"
@@ -120,11 +120,11 @@ def upload_cv(file_path, new_filename, folder_name):
 
     file_id = file["id"]
 
-    print(f"Upload thành công: {file_id}")
+    print("Upload thành công:")
 
     # Public link (Anyone with link can view)
     try:
-        service.permissions().create(
+        drive_service.permissions().create(
             fileId=file_id,
             body={
                 "type": "anyone",
