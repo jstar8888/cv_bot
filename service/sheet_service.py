@@ -94,6 +94,7 @@ def append_candidate(candidate,sheet):
     ]
     
     sheet.append_row(row)
+    print(f"Ghi thành công:")
 
 
 def update_candidate(row, candidate,sheet):
@@ -152,3 +153,5 @@ def update_candidate(row, candidate,sheet):
         [values]
 
     )
+
+    print(f"Cập nhật thành công:")
