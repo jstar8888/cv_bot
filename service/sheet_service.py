@@ -30,9 +30,9 @@ import uuid
 def generate_cv_id():
     return "CV" + uuid.uuid4().hex[:12].upper()
 
-def find_by_email(email):
+def find_by_email(email,sheet):
 
-    sheet = get_sheet()
+    
     emails = sheet.col_values(6)
 
     for index, value in enumerate(emails):
@@ -44,9 +44,9 @@ def find_by_email(email):
     return None
 
 
-def append_candidate(candidate):
+def append_candidate(candidate,sheet):
 
-    sheet = get_sheet()
+    
     row = [
 
         datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%d/%m/%Y"),
@@ -96,9 +96,9 @@ def append_candidate(candidate):
     sheet.append_row(row)
 
 
-def update_candidate(row, candidate):
+def update_candidate(row, candidate,sheet):
 
-    sheet = get_sheet()
+    
     values = [
 
         datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%d/%m/%Y"),
