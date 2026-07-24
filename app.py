@@ -83,7 +83,7 @@ def normalize_filename(text):
     )
 
 
-def process_single_cv(file, selected_job, related_emails, drive_service):
+def process_single_cv(file, selected_job, related_emails, drive_service, uploader_email):
 
     filename = secure_filename(file.filename)
 
@@ -145,12 +145,12 @@ def process_single_cv(file, selected_job, related_emails, drive_service):
     candidate["drive_link"] = drive_link
 
 
-    candidate["uploader_email"] = session["email"]
+    candidate["uploader_email"] = uploader_email
 
 
     emails = related_emails.copy()
 
-    if session["email"] not in emails:
+    if uploader_email not in emails:
         emails.append(session["email"])
 
 
@@ -517,6 +517,7 @@ def upload():
     files = request.files.getlist("cv_files")
     related_emails = request.form.getlist("related_emails")
     selected_job = request.form.get("job_name")
+    uploader_email = session["email"]
 
     success_count = 0
     failed_files = []
@@ -542,7 +543,8 @@ def upload():
                     file,
                     selected_job,
                     related_emails,
-                    drive_service
+                    drive_service,
+                    uploader_email
                 )
             )
 
@@ -574,7 +576,8 @@ def upload():
 
 
             row = find_by_email(
-                candidate["email",sheet_target]
+                candidate["email"],
+                sheet_target
             )
 
 
