@@ -32,6 +32,7 @@ from auth2 import (
     delete_reset_otp,
     save_cv_log
 )
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from service.mail_service import (send_reset_otp, generate_otp)
 
 
@@ -80,6 +81,83 @@ def normalize_filename(text):
         " ",
         ""
     )
+
+
+def process_single_cv(file, selected_job, related_emails, drive_service):
+
+    filename = secure_filename(file.filename)
+
+    save_path = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        filename
+    )
+
+    file.save(save_path)
+
+
+    text = extract_text(save_path)
+
+    candidate = extract_cv(
+        text,
+        selected_job
+    )
+
+
+    if selected_job == "Auto Detect":
+        position = candidate["job_name"]
+    else:
+        position = selected_job
+
+
+    candidate["job_name"] = position
+
+
+    name = normalize_filename(
+        candidate["full_name"]
+    )
+
+    position = normalize_filename(
+        position
+    )
+
+
+    timestamp = datetime.now(
+        ZoneInfo("Asia/Ho_Chi_Minh")
+    ).strftime("%Y-%m-%d %H:%M:%S")
+
+
+    extension = os.path.splitext(filename)[1]
+
+
+    new_filename = (
+        f"{position}_{name}_{timestamp}{extension}"
+    )
+
+
+    drive_link = upload_cv(
+        save_path,
+        new_filename,
+        position,
+        drive_service
+    )
+
+
+    candidate["drive_link"] = drive_link
+
+
+    candidate["uploader_email"] = session["email"]
+
+
+    emails = related_emails.copy()
+
+    if session["email"] not in emails:
+        emails.append(session["email"])
+
+
+    candidate["related_emails"] = ", ".join(emails)
+
+
+    return candidate
 
 @app.route("/login")
 def login_page():
@@ -444,66 +522,75 @@ def upload():
     failed_files = []
     drive_service = get_drive_service()
     sheet_target = get_sheet()
+    results = []
 
-    for file in files:
+     # ==========================
+    # 1. XỬ LÝ CV SONG SONG
+    # ==========================
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+
+
+        futures = []
+
+
+        for file in files:
+
+            futures.append(
+                executor.submit(
+                    process_single_cv,
+                    file,
+                    selected_job,
+                    related_emails,
+                    drive_service
+                )
+            )
+
+
+        for future in as_completed(futures):
+
+            try:
+
+                candidate = future.result()
+
+                results.append(candidate)
+
+
+            except Exception as e:
+
+                failed_files.append(
+                    str(e)
+                )
+
+
+
+    # ==========================
+    # 2. GHI SHEET + LOG TUẦN TỰ
+    # ==========================
+
+    for candidate in results:
 
         try:
 
-            filename = secure_filename(file.filename)
 
-            save_path = os.path.join(
-                app.config["UPLOAD_FOLDER"],
-                filename
+            row = find_by_email(
+                candidate["email",sheet_target]
             )
 
-            file.save(save_path)
-
-            text = extract_text(save_path)
-
-            candidate = extract_cv(text, selected_job)
-
-            if selected_job == "Auto Detect":
-                position = candidate["job_name"]
-            else:
-                position = selected_job
-
-            candidate["job_name"] = position
-
-            name = normalize_filename(candidate["full_name"])
-
-            position = normalize_filename(position)
-
-            timestamp = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S")
-
-            extension = os.path.splitext(filename)[1]
-
-            new_filename = f"{position}_{name}_{timestamp}{extension}"
-
-            drive_link = upload_cv(
-                save_path,
-                new_filename,
-                position,
-                drive_service
-            )
-
-            candidate["drive_link"] = drive_link
-
-            candidate["uploader_email"] = session["email"]
-
-            all_related_emails = related_emails.copy()
-
-            if session["email"] not in all_related_emails:
-                all_related_emails.append(session["email"])
-
-            candidate["related_emails"] = ", ".join(all_related_emails)
-
-            row = find_by_email(candidate["email"],sheet_target)
 
             if row is None:
+
                 append_candidate(candidate,sheet_target)
+
             else:
-                update_candidate(row, candidate,sheet_target)
-            
+
+                update_candidate(
+                    row,
+                    candidate,
+                    sheet_target
+                )
+
+
             save_cv_log(
 
                 uploader_email=session["email"],
@@ -516,27 +603,42 @@ def upload():
 
             )
 
+
             success_count += 1
+
+
 
         except Exception as e:
 
-            print(e)
 
             save_cv_log(
 
                 uploader_email=session["email"],
 
-                candidate_name=candidate["full_name"],
+                candidate_name=candidate.get(
+                    "full_name",
+                    "UNKNOWN"
+                ),
 
-                job_position=candidate["job_name"],
+                job_position=candidate.get(
+                    "job_name",
+                    ""
+                ),
 
                 status="FAIL"
 
             )
 
+
             failed_files.append(
-                f"{file.filename}: {str(e)}"
+                str(e)
             )
+
+
+
+    # ==========================
+    # 3. RESPONSE
+    # ==========================
 
     if not failed_files:
 
@@ -547,11 +649,14 @@ def upload():
         </script>
         """
 
+
+
     message = (
         f"Upload thành công {success_count} file.\\n\\n"
         f"Lỗi {len(failed_files)} file:\\n\\n"
         + "\\n".join(failed_files)
     )
+
 
     return f"""
     <script>
