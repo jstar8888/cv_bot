@@ -316,5 +316,7 @@ def extract_cv(text: str, job=None) -> dict:
         ],
         text_format=CVStructure,
     )
+    print("Input tokens :", response.usage.input_tokens)
+    print("Output tokens:", response.usage.output_tokens)
 
     return response.output_parsed.model_dump()
