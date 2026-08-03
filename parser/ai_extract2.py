@@ -303,7 +303,7 @@ def extract_cv(text: str, job=None) -> dict:
         )
 
     response = client.responses.parse(
-        model="gpt-5-mini",
+        model="gpt-4.1-mini",
         input=[
             {
                 "role": "system",
