@@ -310,4 +310,8 @@ def extract_cv(text: str, job = None) -> dict:
             temperature=0.1, # Giữ mức nhiệt độ thấp để AI tuân thủ quy tắc logic tuyệt đối
         ),
     )
+    if response.usage_metadata:
+        print(f"Input Tokens (Prompt): {response.usage_metadata.prompt_token_count}")
+        print(f"Output Tokens (Candidates): {response.usage_metadata.candidates_token_count}")
+        print(f"Total Tokens: {response.usage_metadata.total_token_count}")
     return json.loads(response.text)
